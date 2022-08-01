@@ -1,0 +1,180 @@
+#include <stdio.h>
+#include<string.h>
+#include "server.h"
+
+void input()
+{
+    char ch;
+    printf("Enter Full name:\n");
+    scanf("%[^\n]",&user.acc_name);
+    fflush(stdin);
+    printf("Enter your account number: \n");
+    scanf("%[^\n]",&user.acc_no);
+    fflush(stdin);
+    printf("Enter the IFSC code: \n");
+    scanf("%[^\n]",&user.IFSC);
+    fflush(stdin);
+    printf("Enter your current account balance: \n");
+    scanf("%f",&user.balance);
+    fflush(stdin);
+    printf("Do you have an existing UPI handler?[Y/N]:\n");
+    fflush(stdin);
+    scanf("%c",&ch);
+    fflush(stdin);
+    if((ch=='Y'||ch=='y'))
+    {
+        printf("Enter your UPI ID:\n");
+        scanf("%[^\n]",&user.upi_id);
+        fflush(stdin);
+        printf("Enter your UPI Pin:\n");
+        scanf("%d",&user.upi_pin);
+        fflush(stdin);
+    }
+    else if((ch=='N'||ch=='n'))
+    {
+        printf("Choose the UPI handler you wish to register with:\n1.Google pay(GPY)\n2.PhonePe(PPE)\n3.Paytm(PTM)\nEnter your choice(1,2 or 3): ");
+        scanf("%c",&ch);
+        fflush(stdin);
+        if(ch=='1')
+        {
+            char email[30];
+            printf("Enter your email ID:\n");
+            scanf("%[^\n]",&email);
+            fflush(stdin);
+            printf("Set your UPI pin (6-digit number):\n");
+            scanf("%d",&user.upi_pin);
+            fflush(stdin);
+            char gpay[]="@gpay";
+            char *a=strtok(email,"@");
+            strcat(a,gpay);
+            strcpy(user.upi_id,a); 
+        }
+        else if(ch=='2')
+        {
+            printf("Enter your phone number(10 digits):\n");
+            scanf("%[^\n]",&user.upi_id);
+            fflush(stdin);
+            printf("Set your UPI pin (6-digit number):\n");
+            scanf("%[^\n]",&user.upi_pin);
+            char Ppe[]="@PhonePe";
+            strcat(user.upi_id,Ppe);
+        }
+        else if(ch=='3')
+        {
+            printf("Enter your phone number(10 digits):\n");
+            scanf("%[^\n]",&user.upi_id);
+            fflush(stdin);
+            printf("Set your UPI pin (6-digit number):\n");
+            scanf("%[^\n]",&user.upi_pin);
+            char Ptm[]="@Paytm";
+            strcat(user.upi_id,Ptm);
+        }
+        else
+            printf("Invalid input");
+        
+    }
+    else
+        printf("Invalid input!!");
+
+}    
+
+
+
+void display()
+{
+    printf("Name : %s\n",user.acc_name);
+    printf("Account Number : %s\n",user.acc_no);
+    printf("IFSC Code : %s\n",user.IFSC);
+    printf("Balance : %.2f\n",user.balance);
+    printf("UPI ID : %s\n",user.upi_id);
+}
+
+void neft_user()
+{
+    fflush(stdin);
+    printf("Enter Name of recepient:\n");
+    scanf("%[^\n]",&neft.rec_acc_name);
+    fflush(stdin);
+    printf("Enter recepient account number: \n");
+    scanf("%[^\n]",&neft.rec_acc_no);
+    fflush(stdin);
+    printf("Enter recepient IFSC code: \n");
+    scanf("%[^\n]",&neft.rec_IFSC);
+    printf("Enter the amount to transfer through NEFT:\n");
+    scanf("%f",&neft.amt);
+    user.balance-= neft.amt;
+    printf("An amount of Rs.%.2f has been DEBITED from your A/C %s\nto recepient %s (A/C %s),\nYour available Balance is Rs.%.2f",neft.amt,user.acc_no,neft.rec_acc_name,neft.rec_acc_no,user.balance);
+}
+
+
+
+a:client.o func.o
+	gcc client.o func.o
+client.o:client.c server.h
+	gcc -c client.c
+func.o:func.c server.h
+	gcc -c func.c		
+
+
+
+
+struct acc_details{
+    char acc_name[60];
+    int acc_no[11];
+    char IFSC[11];
+    char upi_handler[3];
+    char upi_id[40];
+    int upi_pin;
+    float balance;
+    char username[10];   
+}user;
+
+/*struct acc_details_crypto{
+    char C_acc_name[60];
+    int C_acc_no[11];
+    char C_IFSC[11];
+    char C_upi_handler[3];
+    char C_upi_id[40];
+    int C_upi_pin;
+    float C_balance;
+    char C_username[10];   
+}userC;*/
+
+struct NEFT{
+    char rec_IFSC[11];
+    int rec_acc_no[11];
+    char rec_acc_name[60];
+    float amt;
+}neft;
+
+struct debcred{
+    char rec_upi_id[40];
+    char rec_acc_name[60];
+}DEBCRED;
+
+void input();
+void display();
+void neft_user();
+
+
+
+
+#include <stdio.h>
+#include "server.h"
+
+
+
+
+int main()
+{
+    input();
+    FILE *fp;
+    char cfile[]="Data.csv";
+    fp=fopen(cfile,"w+");
+    fprintf(fp,"Customer name,Account number,IFSC code,Account balance,UPI handler,UPI Pin");
+    //fprintf(fp,"\n%s,%s,%s,%.2f,%s,%d",user.acc_name,user.acc_no,user.IFSC,user.balance,user.upi_id,user.upi_pin);  
+      
+    
+
+    return 0;
+}
